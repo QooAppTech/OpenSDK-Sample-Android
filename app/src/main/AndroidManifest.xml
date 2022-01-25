@@ -21,18 +21,10 @@
 
         <meta-data
             android:name="com.qooapp.APP_ID"
-            android:value="SAND45d01826784f11ecab4506a4094a134e"/>
+            android:value="Your app_id"/>
         <meta-data
             android:name="com.qooapp.PUBLIC_KEY"
-            android:value="-----BEGIN PUBLIC KEY-----
-MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAxiES/ZwVqpzWOhQXILZL
-U+JePgBe6PnfmWlTMTkh3bFtU6BfsdpZRREH05PeoQs3Em/oZqzaT6/JTLZ8Aq/L
-fGlWRYmYjnssFpkPvkHu655v+fueX1X6yY+TQlImses9W34UIU53FjEqPV3JVTVZ
-50srEP7/bWiAuP1lXlW05QPyyNoxecab9voA38zWCrbDGh3SX0GY8cYnN2ZkYW2d
-6HgzH/LemT/HgoX16OjzdjrCNp4xBJJaSf/jCLp4/DMB13xcWka3X4RI3LQK94+B
-/L3QI7j0jaVxeE8egC56BJHJG/p44mGmJfQPwAdDnXFIngB7aa5IIk+XXh8WBhcm
-ywIDAQAB
------END PUBLIC KEY-----"/>
+            android:value="Your Public Key"/>
     </application>
 
 </manifest>
