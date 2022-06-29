@@ -3,7 +3,6 @@ package com.qooapp.opensdk.sample.qooapp;
 
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -11,6 +10,7 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -71,7 +71,7 @@ public class MainActivity extends AppCompatActivity {
 
                 Gson gson = new Gson();
                 OrderBean orderBean = gson.fromJson(jsonObject.toString(), OrderBean.class);
-                showToast(MainActivity.this, "Purchasing successful，Consuming...[purchase_id:" + orderBean.getPurchase_id() + ",token:" + orderBean.getToken());
+                showToast("Purchasing successful，Consuming...[purchase_id:" + orderBean.getPurchase_id() + ",token:" + orderBean.getToken());
                 showPaymentDialog((dialog, which) -> {
                     showProgress();
                     consumePurchase(orderBean.getPurchase_id(), orderBean.getToken());
@@ -83,12 +83,12 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public void onError(String error) {
-            showToast(MainActivity.this, "Error:" + error);
+            showToast("Error:" + error);
         }
 
         @Override
         public void onCancel() {
-            showToast(MainActivity.this, "Be canceled");
+            showToast("Be canceled");
         }
     };
 
@@ -129,18 +129,18 @@ public class MainActivity extends AppCompatActivity {
                 QooAppOpenSDK.getInstance().logout(new QooAppCallback() {
                     @Override
                     public void onSuccess(String response) {
-                        showToast(MainActivity.this, response);
+                        showToast(response);
                     }
 
                     @Override
                     public void onError(String error) {
-                        showToast(MainActivity.this, error);
+                        showToast(error);
 
                     }
                 }, MainActivity.this);
             } catch (Exception e) {
                 e.printStackTrace();
-                showToast(MainActivity.this, e.getMessage());
+                showToast(e.getMessage());
             }
         });
 
@@ -230,28 +230,27 @@ public class MainActivity extends AppCompatActivity {
         QooAppOpenSDK.getInstance().consume(new QooAppCallback() {
             @Override
             public void onSuccess(String response) {
-                showToast(MainActivity.this, "Consumption successful!");
-                Log.d("mQooAppOpenSDK", "response = "+response);
+                showToast("Consumption successful!");
+                Log.d("QooAppOpenSDK", "response = "+response);
                 hideProgress();
                 QooAppOpenSDK.getInstance().closePaymentUI();
             }
 
             @Override
             public void onError(String error) {
-                Log.e("mQooAppOpenSDK", "error = "+error);
+                Log.e("QooAppOpenSDK", "error = "+error);
                 hideProgress();
-                showToast(MainActivity.this, "Consuming error:" + error);
+                showToast("Consuming error:" + error);
             }
         }, purchase_id, token);
     }
 
     /**
      * show toast info
-     * @param context
      * @param text
      */
-    private void showToast(Context context, CharSequence text) {
-        Toast toast = Toast.makeText(context, text, Toast.LENGTH_SHORT);
+    private void showToast(CharSequence text) {
+        Toast toast = Toast.makeText(MainActivity.this, text, Toast.LENGTH_SHORT);
         toast.show();
     }
 
@@ -259,7 +258,7 @@ public class MainActivity extends AppCompatActivity {
      * @param type which type info
      * @param result
      */
-    private void displayResult(int type, final String result) {
+    private void displayResult(final int type, final String result) {
         Log.d(TAG,"type = "+type+", result = "+result);
         hideProgress();
         showDialog(result, (dialog, which) -> {
@@ -301,7 +300,7 @@ public class MainActivity extends AppCompatActivity {
             }
         } catch (JSONException e) {
             e.printStackTrace();
-            showToast(this, e.getMessage());
+            showToast(e.getMessage());
         }
     }
 
@@ -330,7 +329,7 @@ public class MainActivity extends AppCompatActivity {
             }
         } catch (JSONException e) {
             e.printStackTrace();
-            showToast(this, e.getMessage());
+            showToast(e.getMessage());
         }
     }
 
