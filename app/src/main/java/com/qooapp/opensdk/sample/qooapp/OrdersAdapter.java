@@ -53,7 +53,7 @@ public class OrdersAdapter extends BaseAdapter{
         }
         final OrderBean info = mDataList.get(position);
         holder.tvName.setText(info.getProduct_id() + "(" + info.getPurchase_id() + ")");
-        holder.tvPrice.setText("consume?");
+        holder.tvPrice.setText(info.getAmount()+info.getCurrency());
         holder.tvIndex.setText((position+1)+"");
         return view;
     }

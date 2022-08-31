@@ -10,7 +10,6 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -19,6 +18,7 @@ import com.qooapp.opensdk.QooAppOpenSDK;
 import com.qooapp.opensdk.common.PaymentCallback;
 import com.qooapp.opensdk.common.QooAppCallback;
 import com.qooapp.opensdk.sample.qooapp.model.OrderBean;
+import com.qooapp.opensdk.sample.qooapp.model.PageProductResponse;
 import com.qooapp.opensdk.sample.qooapp.model.Product;
 
 import org.json.JSONArray;
@@ -52,9 +52,11 @@ public class MainActivity extends AppCompatActivity {
 
     private final int TYPE_VERIFY = 3;
 
-    private final int TYPE_QUERY_PRODUCT = 4;
+    private final int TYPE_QUERY_PAGE_PRODUCT = 4;
 
-    private final int TYPE_QUERY_RECORD = 5;
+    private final int TYPE_QUERY_PRODUCT = 5;
+
+    private final int TYPE_QUERY_RECORD = 6;
 
     private PaymentCallback mPaymentCallback = new PaymentCallback() {
         @Override
@@ -143,6 +145,9 @@ public class MainActivity extends AppCompatActivity {
                 showToast(e.getMessage());
             }
         });
+        findViewById(R.id.btn_open_qoo).setOnClickListener(v -> {
+            QooAppOpenSDK.getInstance().openGameDetail(this);
+        });
 
         findViewById(R.id.btn_check_reward).setOnClickListener(v -> {
             showProgress();
@@ -180,6 +185,22 @@ public class MainActivity extends AppCompatActivity {
                     displayResult(TYPE_VERIFY, error);
                 }
             });
+        });
+
+        findViewById(R.id.btn_product_page).setOnClickListener(v -> {
+            showProgress();
+            QooAppOpenSDK.getInstance().queryProducts(new QooAppCallback() {
+                @Override
+                public void onSuccess(String result) {
+                    hideProgress();
+                    displayResult(TYPE_QUERY_PRODUCT, result);
+                }
+
+                @Override
+                public void onError(String error) {
+                    displayResult(TYPE_ERROR, error);
+                }
+            }, 1);
         });
 
         findViewById(R.id.btn_products).setOnClickListener(v -> {
@@ -266,6 +287,9 @@ public class MainActivity extends AppCompatActivity {
                 case TYPE_LOGIN:
                     showFunctionView();
                     break;
+                case TYPE_QUERY_PAGE_PRODUCT:
+                    parsePageProducts(result);
+                    break;
                 case TYPE_QUERY_PRODUCT:
                     parseProducts(result);
                     break;
@@ -274,6 +298,31 @@ public class MainActivity extends AppCompatActivity {
                     break;
             }
         });
+    }
+
+    /**
+     * 解析产品列表
+     *
+     * @param result
+     */
+    private void parsePageProducts(String result) {
+        try {
+            JSONObject jsonObject = new JSONObject(result);
+            mProductsList.clear();
+            Gson gson = new Gson();
+            PageProductResponse response = gson.fromJson(result, PageProductResponse.class);
+            PageProductResponse.PagerBean pagerBean = response.getData().getPager();
+            mProductsList = response.getData().getItems();
+            if (pagerBean.getTotal() < pagerBean.getSize()) {
+                showToast("only "+pagerBean.getTotal()+" products, no need get next page");
+            } else {
+                showToast("has more products, this is No. "+pagerBean.getPage() +" page, "+pagerBean.getSize()+" products per page. There are "+pagerBean.getTotal()+" products in total");
+            }
+            showProductView();
+        } catch (JSONException e) {
+            e.printStackTrace();
+            showToast(e.getMessage());
+        }
     }
 
     /**
@@ -288,20 +337,39 @@ public class MainActivity extends AppCompatActivity {
             if (dataArray != null) {
                 mProductsList.clear();
                 mProductsList = parseString2List(dataArray.toString(), Product.class);
-
-                ProductAdapter adapter = new ProductAdapter(this, mProductsList);
-                mListView.setVisibility(View.VISIBLE);
-                mListView.setAdapter(adapter);
-                mListView.setOnItemClickListener((parent, view, position, id) -> {
-                    final Product product = mProductsList.get(position);
-                    QooAppOpenSDK.getInstance().purchase(mPaymentCallback, MainActivity.this, product.getProduct_id(), "cporderid----", "dev-0110");
-                });
-                showProducts("Products");
+                showProductView();
             }
         } catch (JSONException e) {
             e.printStackTrace();
             showToast(e.getMessage());
         }
+    }
+
+    private void showProductView() {
+        ProductAdapter adapter = new ProductAdapter(this, mProductsList, (type, productId) -> {
+            if (type == ProductAdapter.TYPE_DETAIL) {
+                // get product detail
+                showProgress();
+                QooAppOpenSDK.getInstance().queryProductsInfo(new QooAppCallback() {
+                    @Override
+                    public void onSuccess(String result) {
+                        hideProgress();
+                        displayResult(TYPE_ERROR, result);
+                    }
+
+                    @Override
+                    public void onError(String error) {
+                        displayResult(TYPE_ERROR, error);
+                    }
+                }, productId);
+            } else {
+                // buy
+                QooAppOpenSDK.getInstance().purchase(mPaymentCallback, MainActivity.this,  productId, "your cpOrderId:"+System.currentTimeMillis(), "your developerPayload:"+System.currentTimeMillis());
+            }
+        });
+        mListView.setVisibility(View.VISIBLE);
+        mListView.setAdapter(adapter);
+        showProducts("Products");
     }
 
     /**
@@ -314,7 +382,7 @@ public class MainActivity extends AppCompatActivity {
             JSONObject obj = new JSONObject(result);
             JSONArray dataArray = obj.getJSONArray("data");
 
-            if (dataArray != null) {
+            if (dataArray.length() > 0) {
                 mOrdersList = parseString2List(dataArray.toString(), OrderBean.class);
                 OrdersAdapter adapter = new OrdersAdapter(this, mOrdersList);
                 mListView.setAdapter(adapter);
@@ -325,8 +393,8 @@ public class MainActivity extends AppCompatActivity {
                         consumePurchase(orderBean.getPurchase_id(), orderBean.getToken());
                     });
                 });
-                showProducts("Records");
             }
+            showProducts("Records");
         } catch (JSONException e) {
             e.printStackTrace();
             showToast(e.getMessage());

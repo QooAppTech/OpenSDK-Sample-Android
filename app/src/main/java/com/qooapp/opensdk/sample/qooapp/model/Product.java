@@ -7,39 +7,6 @@ import java.util.List;
  * @email devel@qoo-app.com
  */
 public class Product {
-    /**
-     * {
-     *   "product_id": "1",
-     *   "name": "1",
-     *   "description": "1",
-     *   "price": {
-     *     "paypal": {
-     *       "channel": "paypal",
-     *       "amount": "2.00",
-     *       "currency": "USD"
-     *     },
-     *     "stripe": {
-     *       "channel": "stripe",
-     *       "amount": "15.58",
-     *       "currency": "HKD"
-     *     },
-     *     "mol": {
-     *       "channel": "mol",
-     *       "amount": "2.00",
-     *       "currency": "USD"
-     *     },
-     *     "mycard": {
-     *       "channel": "mycard",
-     *       "amount": 56,
-     *       "currency": "TWD"
-     *     }
-     *   },
-     *   "one_off_limit": {
-     *     "cycle": "none",
-     *     "length": 0
-     *   },
-     *   "consumable": true
-     */
     private String product_id;
     private String name;
     private String description;

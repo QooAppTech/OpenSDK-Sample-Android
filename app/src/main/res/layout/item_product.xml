@@ -35,4 +35,16 @@
         android:layout_centerVertical="true"
         android:textSize="12sp"
         android:text="price"/>
+
+    <Button
+        android:id="@+id/btn_buy"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="0"
+        android:layout_marginRight="5dp"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:textSize="12sp"
+        android:visibility="gone"
+        android:text="buy"/>
 </LinearLayout>
