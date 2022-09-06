@@ -193,7 +193,7 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void onSuccess(String result) {
                     hideProgress();
-                    displayResult(TYPE_QUERY_PRODUCT, result);
+                    displayResult(TYPE_QUERY_PAGE_PRODUCT, result);
                 }
 
                 @Override
@@ -306,23 +306,17 @@ public class MainActivity extends AppCompatActivity {
      * @param result
      */
     private void parsePageProducts(String result) {
-        try {
-            JSONObject jsonObject = new JSONObject(result);
-            mProductsList.clear();
-            Gson gson = new Gson();
-            PageProductResponse response = gson.fromJson(result, PageProductResponse.class);
-            PageProductResponse.PagerBean pagerBean = response.getData().getPager();
-            mProductsList = response.getData().getItems();
-            if (pagerBean.getTotal() < pagerBean.getSize()) {
-                showToast("only "+pagerBean.getTotal()+" products, no need get next page");
-            } else {
-                showToast("has more products, this is No. "+pagerBean.getPage() +" page, "+pagerBean.getSize()+" products per page. There are "+pagerBean.getTotal()+" products in total");
-            }
-            showProductView();
-        } catch (JSONException e) {
-            e.printStackTrace();
-            showToast(e.getMessage());
+        mProductsList.clear();
+        Gson gson = new Gson();
+        PageProductResponse response = gson.fromJson(result, PageProductResponse.class);
+        PageProductResponse.PagerBean pagerBean = response.getData().getPager();
+        mProductsList = response.getData().getItems();
+        if (pagerBean.getTotal() < pagerBean.getSize()) {
+            showToast("only "+pagerBean.getTotal()+" products, no need get next page");
+        } else {
+            showToast("has more products, this is No. "+pagerBean.getPage() +" page, "+pagerBean.getSize()+" products per page. There are "+pagerBean.getTotal()+" products in total");
         }
+        showProductView();
     }
 
     /**
