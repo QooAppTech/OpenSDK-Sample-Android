@@ -44,7 +44,9 @@ public class MainActivity extends AppCompatActivity {
     private List<Product> mProductsList = new ArrayList<>();
     private List<OrderBean> mOrdersList = new ArrayList<>();
 
-    private final int TYPE_ERROR = 0;
+    private final int TYPE_ERROR = -1;
+
+    private final int TYPE_INITIALIZE = 0;
 
     private final int TYPE_LOGIN = 1;
 
@@ -115,7 +117,7 @@ public class MainActivity extends AppCompatActivity {
             QooAppOpenSDK.initialize(new QooAppCallback() {
                 @Override
                 public void onSuccess(String response) {
-                    displayResult(TYPE_LOGIN, response);
+                    displayResult(TYPE_INITIALIZE, response);
                 }
 
                 @Override
@@ -123,6 +125,36 @@ public class MainActivity extends AppCompatActivity {
                     displayResult(TYPE_ERROR, error);
                 }
             }, this);
+
+        });
+        findViewById(R.id.btn_login).setOnClickListener(v -> {
+            showProgress();
+            QooAppOpenSDK.getInstance().login(new QooAppCallback() {
+                @Override
+                public void onSuccess(String response) {
+                    displayResult(TYPE_INITIALIZE, response);
+                }
+
+                @Override
+                public void onError(String error) {
+                    displayResult(TYPE_ERROR, error);
+                }
+            }, MainActivity.this);
+
+        });
+        findViewById(R.id.btn_last_version).setOnClickListener(v -> {
+            showProgress();
+            QooAppOpenSDK.getInstance().latestVersionCode(new QooAppCallback() {
+                @Override
+                public void onSuccess(String response) {
+                    displayResult(TYPE_ERROR, response);
+                }
+
+                @Override
+                public void onError(String error) {
+                    displayResult(TYPE_ERROR, error);
+                }
+            });
 
         });
 
@@ -284,6 +316,9 @@ public class MainActivity extends AppCompatActivity {
         hideProgress();
         showDialog(result, (dialog, which) -> {
             switch (type) {
+                case TYPE_INITIALIZE:
+                    showToast("initialize success");
+                    break;
                 case TYPE_LOGIN:
                     showFunctionView();
                     break;

@@ -36,6 +36,26 @@
                 android:textAllCaps="false"/>
 
             <Button
+                android:id="@+id/btn_login"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/purple_500"
+                android:layout_marginTop="10dp"
+                android:text="login()"
+                android:textColor="@android:color/white"
+                android:textAllCaps="false"/>
+
+            <Button
+                android:id="@+id/btn_last_version"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/purple_500"
+                android:layout_marginTop="10dp"
+                android:text="latestVersionCode()"
+                android:textColor="@android:color/white"
+                android:textAllCaps="false"/>
+
+            <Button
                 android:id="@+id/btn_logout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
