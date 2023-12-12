@@ -1,15 +1,19 @@
 package com.qooapp.opensdk.sample.qooapp;
 
 
+import static android.util.Base64.DEFAULT;
+
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Base64;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -17,12 +21,11 @@ import com.google.gson.Gson;
 import com.qooapp.opensdk.QooAppOpenSDK;
 import com.qooapp.opensdk.common.PaymentCallback;
 import com.qooapp.opensdk.common.QooAppCallback;
+import com.qooapp.opensdk.common.model.SDKLocales;
 import com.qooapp.opensdk.sample.qooapp.model.OrderBean;
 import com.qooapp.opensdk.sample.qooapp.model.PageProductResponse;
 import com.qooapp.opensdk.sample.qooapp.model.Product;
 
-import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.lang.reflect.ParameterizedType;
@@ -35,6 +38,8 @@ public class MainActivity extends AppCompatActivity {
     private final String TAG = "MainActivity";
 
     private View mLayoutFunction;
+
+    private EditText mEdtLanguage;
 
     private ListView mListView;
     private long mBackKeyTime = 0;
@@ -59,43 +64,6 @@ public class MainActivity extends AppCompatActivity {
     private final int TYPE_QUERY_PRODUCT = 5;
 
     private final int TYPE_QUERY_RECORD = 6;
-
-    private PaymentCallback mPaymentCallback = new PaymentCallback() {
-        @Override
-        public void onComplete(String json) {
-
-            //Handle success case
-            try {
-                /**
-                 * 1、purchase success，then please distribute goods to player.
-                 * 2、When player get product, you must call consumePurchase();
-                 */
-                JSONObject obj = new JSONObject(json);
-                JSONObject jsonObject = obj.getJSONObject("data");
-
-                Gson gson = new Gson();
-                OrderBean orderBean = gson.fromJson(jsonObject.toString(), OrderBean.class);
-                showToast("Purchasing successful，Consuming...[purchase_id:" + orderBean.getPurchase_id() + ",token:" + orderBean.getToken());
-                showPaymentDialog((dialog, which) -> {
-                    showProgress();
-                    consumePurchase(orderBean.getPurchase_id(), orderBean.getToken());
-                });
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        }
-
-        @Override
-        public void onError(String error) {
-            showToast("Error:" + error);
-        }
-
-        @Override
-        public void onCancel() {
-            showToast("Be canceled");
-        }
-    };
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,  WindowManager.LayoutParams.FLAG_FULLSCREEN);
@@ -181,25 +149,6 @@ public class MainActivity extends AppCompatActivity {
             QooAppOpenSDK.getInstance().openGameDetail(this);
         });
 
-        findViewById(R.id.btn_check_reward).setOnClickListener(v -> {
-            showProgress();
-            QooAppOpenSDK.getInstance().checkReward(new QooAppCallback() {
-
-                @Override
-                public void onSuccess(String info) {
-                    // verification succeed
-                    displayResult(TYPE_REWARD, info);
-                }
-
-                @Override
-                public void onError(String error) {
-                    // For unknown reason, verification cannot be done.
-                    // Please disallow access for proper protection.
-                    displayResult(TYPE_ERROR, error);
-                }
-            });
-        });
-
         findViewById(R.id.btn_verify).setOnClickListener(v -> {
             showProgress();
             QooAppOpenSDK.getInstance().checkLicense(new QooAppCallback() {
@@ -223,9 +172,9 @@ public class MainActivity extends AppCompatActivity {
             showProgress();
             QooAppOpenSDK.getInstance().queryProducts(new QooAppCallback() {
                 @Override
-                public void onSuccess(String result) {
+                public void onSuccess(String response) {
                     hideProgress();
-                    displayResult(TYPE_QUERY_PAGE_PRODUCT, result);
+                    displayResult(TYPE_QUERY_PAGE_PRODUCT, response);
                 }
 
                 @Override
@@ -239,8 +188,8 @@ public class MainActivity extends AppCompatActivity {
             showProgress();
             QooAppOpenSDK.getInstance().queryProducts(new QooAppCallback() {
                 @Override
-                public void onSuccess(String result) {
-                    displayResult(TYPE_QUERY_PRODUCT, result);
+                public void onSuccess(String response) {
+                    displayResult(TYPE_QUERY_PRODUCT, response);
                 }
 
                 @Override
@@ -254,9 +203,9 @@ public class MainActivity extends AppCompatActivity {
             showProgress();
             QooAppOpenSDK.getInstance().restorePurchases(new QooAppCallback() {
                 @Override
-                public void onSuccess(String result) {
+                public void onSuccess(String response) {
                     hideProgress();
-                    displayResult(TYPE_QUERY_RECORD, result);
+                    displayResult(TYPE_QUERY_RECORD, response);
                 }
 
                 @Override
@@ -265,6 +214,22 @@ public class MainActivity extends AppCompatActivity {
                     displayResult(TYPE_ERROR, error);
                 }
             });
+        });
+        mEdtLanguage = findViewById(R.id.edt_locale);
+        findViewById(R.id.btn_select_locale).setOnClickListener(v -> {
+            final String[] locales = {SDKLocales.EN, SDKLocales.JA, SDKLocales.KO, SDKLocales.ES, SDKLocales.TH, SDKLocales.FR, SDKLocales.PT, SDKLocales.ZH_CN, SDKLocales.ZH_HK, SDKLocales.ZH_TW};
+            new AlertDialog.Builder(MainActivity.this)
+                    .setTitle("chose language")
+                            .setSingleChoiceItems(locales, 0, (dialog, which) -> {
+                                mEdtLanguage.setText(locales[which]);
+                                dialog.dismiss();
+                            })
+                    .setNegativeButton("", null)
+                    .show();
+        });
+        findViewById(R.id.btn_set_locale).setOnClickListener(v -> {
+            boolean isSuccess = QooAppOpenSDK.setLocale(mEdtLanguage.getText().toString());
+            showToast("Set language: "+ mEdtLanguage.getText().toString() +", isSuccess" + isSuccess);
         });
     }
 
@@ -336,16 +301,16 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
-     * 解析产品列表
+     * parse products
      *
-     * @param result
+     * @param response
      */
-    private void parsePageProducts(String result) {
+    private void parsePageProducts(String response) {
         mProductsList.clear();
         Gson gson = new Gson();
-        PageProductResponse response = gson.fromJson(result, PageProductResponse.class);
-        PageProductResponse.PagerBean pagerBean = response.getData().getPager();
-        mProductsList = response.getData().getItems();
+        PageProductResponse.DataBean dataBean = gson.fromJson(getDataStringFromResponse(response), PageProductResponse.DataBean.class);
+        PageProductResponse.PagerBean pagerBean = dataBean.getPager();
+        mProductsList = dataBean.getItems();
         if (pagerBean.getTotal() < pagerBean.getSize()) {
             showToast("only "+pagerBean.getTotal()+" products, no need get next page");
         } else {
@@ -356,22 +321,12 @@ public class MainActivity extends AppCompatActivity {
 
     /**
      * parse products list info
-     * @param result
+     * @param response
      */
-    private void parseProducts(String result) {
-        Log.d(TAG, "result："+result);
-        try {
-            JSONObject jsonObject = new JSONObject(result);
-            JSONArray dataArray = jsonObject.getJSONArray("data");
-            if (dataArray != null) {
-                mProductsList.clear();
-                mProductsList = parseString2List(dataArray.toString(), Product.class);
-                showProductView();
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
-            showToast(e.getMessage());
-        }
+    private void parseProducts(String response) {
+        mProductsList.clear();
+        mProductsList = parseString2List(getDataStringFromResponse(response), Product.class);
+        showProductView();
     }
 
     private void showProductView() {
@@ -393,7 +348,34 @@ public class MainActivity extends AppCompatActivity {
                 }, productId);
             } else {
                 // buy
-                QooAppOpenSDK.getInstance().purchase(mPaymentCallback, MainActivity.this,  productId, "your cpOrderId:"+System.currentTimeMillis(), "your developerPayload:"+System.currentTimeMillis());
+                QooAppOpenSDK.getInstance().purchase(new PaymentCallback() {
+                    @Override
+                    public void onComplete(String response) {
+
+                        //Handle success case
+                        /**
+                         * 1、purchase success，then please distribute goods to player.
+                         * 2、When player get product, you must call consumePurchase();
+                         */
+                        Gson gson = new Gson();
+                        OrderBean orderBean = gson.fromJson(getDataStringFromResponse(response), OrderBean.class);
+                        showToast("Purchasing successful，Consuming...[purchase_id:" + orderBean.getPurchase_id() + ",token:" + orderBean.getToken());
+                        showPaymentDialog((dialog, which) -> {
+                            showProgress();
+                            consumePurchase(orderBean.getPurchase_id(), orderBean.getToken());
+                        });
+                    }
+
+                    @Override
+                    public void onError(String error) {
+                        showToast("Error:" + error);
+                    }
+
+                    @Override
+                    public void onCancel() {
+                        showToast("Be canceled");
+                    }
+                }, MainActivity.this,  productId, "your cpOrderId:"+System.currentTimeMillis(), "your developerPayload:"+System.currentTimeMillis());
             }
         });
         mListView.setVisibility(View.VISIBLE);
@@ -403,31 +385,20 @@ public class MainActivity extends AppCompatActivity {
 
     /**
      * parse records list
-     * @param result
+     * @param response
      */
-    private void parseRecords(String result) {
-        try {
-
-            JSONObject obj = new JSONObject(result);
-            JSONArray dataArray = obj.getJSONArray("data");
-
-            if (dataArray.length() > 0) {
-                mOrdersList = parseString2List(dataArray.toString(), OrderBean.class);
-                OrdersAdapter adapter = new OrdersAdapter(this, mOrdersList);
-                mListView.setAdapter(adapter);
-                mListView.setOnItemClickListener((parent, view, position, id) -> {
-                    final OrderBean orderBean = mOrdersList.get(position);
-                    showDialog("consume this order? ",  (dialog, which) -> {
-                        showProgress();
-                        consumePurchase(orderBean.getPurchase_id(), orderBean.getToken());
-                    });
-                });
-            }
-            showProducts("Records");
-        } catch (JSONException e) {
-            e.printStackTrace();
-            showToast(e.getMessage());
-        }
+    private void parseRecords(String response) {
+        mOrdersList = parseString2List(getDataStringFromResponse(response), OrderBean.class);
+        OrdersAdapter adapter = new OrdersAdapter(this, mOrdersList);
+        mListView.setAdapter(adapter);
+        mListView.setOnItemClickListener((parent, view, position, id) -> {
+            final OrderBean orderBean = mOrdersList.get(position);
+            showDialog("consume this order? ",  (dialog, which) -> {
+                showProgress();
+                consumePurchase(orderBean.getPurchase_id(), orderBean.getToken());
+            });
+        });
+        showProducts("Records");
     }
 
     private void showFunctionView() {
@@ -519,5 +490,23 @@ public class MainActivity extends AppCompatActivity {
         public Type getOwnerType() {
             return null;
         }
+    }
+
+    /**
+     * get data json string from response.
+     * You can use `QooAppOpenSDK.getDataFromResponse(response)` to replace the following method
+     * @param response
+     * @return
+     */
+    private String getDataStringFromResponse(String response) {
+//        return QooAppOpenSDK.getDataFromResponse(response);
+        try {
+            JSONObject resJson = new JSONObject(response);
+            String dataString = resJson.optString("data");
+            return new String(Base64.decode(dataString, DEFAULT), "UTF-8");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return "";
     }
 }

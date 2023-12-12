@@ -2,7 +2,7 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/white" >
+    android:background="@android:color/white">
 
     <ScrollView
         android:id="@+id/sv_function"
@@ -10,100 +10,83 @@
         android:layout_height="match_parent"
         android:layout_gravity="center"
         android:scrollbars="vertical">
+
         <LinearLayout
             android:id="@+id/layout_init"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="10dp"
-            android:orientation="vertical"
-            android:gravity="center">
+            android:gravity="center"
+            android:orientation="vertical">
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:autoLink="all"
+                android:gravity="center"
                 android:text="you need initialize first!"
-                android:autoLink="all"
-                android:gravity="center"
                 android:textColor="@color/purple_200" />
 
-            <Button
-                android:id="@+id/btn_init"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@color/purple_500"
-                android:layout_marginTop="10dp"
-                android:text="initialize()"
-                android:textColor="@android:color/white"
-                android:textAllCaps="false"/>
+                android:orientation="horizontal">
 
-            <Button
-                android:id="@+id/btn_login"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@color/purple_500"
-                android:layout_marginTop="10dp"
-                android:text="login()"
-                android:textColor="@android:color/white"
-                android:textAllCaps="false"/>
+                <Button
+                    android:id="@+id/btn_init"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="5dp"
+                    android:layout_weight="1"
+                    android:background="@color/purple_700"
+                    android:text="initialize()"
+                    android:textAllCaps="false"
+                    android:textColor="@android:color/white" />
 
-            <Button
-                android:id="@+id/btn_last_version"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@color/purple_500"
-                android:layout_marginTop="10dp"
-                android:text="latestVersionCode()"
-                android:textColor="@android:color/white"
-                android:textAllCaps="false"/>
+                <Button
+                    android:id="@+id/btn_login"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="5dp"
+                    android:layout_weight="1"
+                    android:background="@color/purple_700"
+                    android:text="login()"
+                    android:textAllCaps="false"
+                    android:textColor="@android:color/white" />
 
-            <Button
-                android:id="@+id/btn_logout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
-                android:background="@color/purple_500"
-                android:textColor="@android:color/white"
-                android:paddingStart="10dp"
-                android:paddingEnd="10dp"
-                android:textAllCaps="false"
-                android:text="logout" />
+                <Button
+                    android:id="@+id/btn_logout"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_margin="5dp"
+                    android:background="@color/purple_700"
+                    android:paddingStart="10dp"
+                    android:paddingEnd="10dp"
+                    android:text="logout"
+                    android:textAllCaps="false"
+                    android:textColor="@android:color/white" />
 
-            <Button
-                android:id="@+id/btn_open_qoo"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="5dp"
-                android:background="@color/purple_700"
-                android:paddingStart="10dp"
-                android:paddingEnd="10dp"
-                android:textAllCaps="false"
-                android:text="openGameDetail page in QooApp"
-                android:textColor="@android:color/white" />
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="chose what you want"
-                android:layout_marginTop="20dp"
-                android:autoLink="all"
-                android:gravity="center"
-                android:textColor="@color/purple_200" />
-            <Button
-                android:id="@+id/btn_check_reward"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="10dp"
-                android:background="@color/purple_700"
-                android:text="checkReward()"
-                android:textColor="@android:color/white"
-                android:textAllCaps="false"/>
+            </LinearLayout>
+
             <Button
                 android:id="@+id/btn_verify"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="10dp"
+                android:layout_margin="5dp"
                 android:background="@color/purple_700"
-                android:text="checkLicense()"
-                android:textColor="@android:color/white"
-                android:textAllCaps="false"/>
+                android:text="checkLicense if game not free"
+                android:textAllCaps="false"
+                android:textColor="@android:color/white" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:autoLink="all"
+                android:gravity="center"
+                android:text="Payment"
+                android:textColor="@color/purple_200" />
 
             <Button
                 android:id="@+id/btn_product_page"
@@ -119,25 +102,97 @@
                 android:id="@+id/btn_products"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="10dp"
-                android:layout_marginTop="10dp"
-                android:layout_marginRight="10dp"
+                android:layout_margin="5dp"
                 android:background="@color/purple_700"
                 android:text="queryProducts()"
                 android:textAllCaps="false"
-                android:textColor="@android:color/white"/>
+                android:textColor="@android:color/white" />
 
             <Button
                 android:id="@+id/btn_purchased"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="10dp"
-                android:layout_marginTop="20dp"
-                android:layout_marginRight="10dp"
+                android:layout_margin="5dp"
                 android:background="@color/purple_700"
                 android:text="restorePurchases()"
                 android:textAllCaps="false"
-                android:textColor="@android:color/white"/>
+                android:textColor="@android:color/white" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="5dp"
+                android:background="@android:color/holo_purple" >
+
+                <Button
+                    android:id="@+id/btn_last_version"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_margin="5dp"
+                    android:background="@color/purple_500"
+                    android:text="latest VersionCode"
+                    android:textAllCaps="false"
+                    android:textColor="@android:color/white" />
+
+                <Button
+                    android:id="@+id/btn_open_qoo"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="5dp"
+                    android:layout_weight="1"
+                    android:background="@color/purple_500"
+                    android:text="to Detail page"
+                    android:textAllCaps="false"
+                    android:textColor="@android:color/white" />
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:background="@android:color/darker_gray"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:background="@android:color/holo_purple" >
+
+                <EditText
+                    android:id="@+id/edt_locale"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="5"
+                    android:layout_margin="5dp"
+                    android:hint="en_US"
+                    android:textAllCaps="false"
+                    android:textColor="@android:color/white" />
+
+                <Button
+                    android:id="@+id/btn_select_locale"
+                    android:layout_width="30dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginEnd="5dp"
+                    android:layout_marginBottom="5dp"
+                    android:background="@color/purple_500"
+                    android:text="▼"
+                    android:textAllCaps="false"
+                    android:textColor="@android:color/white" />
+
+                <Button
+                    android:id="@+id/btn_set_locale"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="5"
+                    android:layout_margin="5dp"
+                    android:background="@color/purple_500"
+                    android:text="Set Language"
+                    android:textAllCaps="false"
+                    android:textColor="@android:color/white" />
+            </LinearLayout>
         </LinearLayout>
     </ScrollView>
 
@@ -150,5 +205,5 @@
         android:divider="#f0f0f0"
         android:dividerHeight="1dp"
         android:orientation="vertical"
-        android:visibility="gone"/>
+        android:visibility="gone" />
 </FrameLayout>
