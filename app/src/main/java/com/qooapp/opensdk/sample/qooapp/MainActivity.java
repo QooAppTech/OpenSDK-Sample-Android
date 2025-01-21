@@ -147,6 +147,7 @@ public class MainActivity extends AppCompatActivity {
         });
         findViewById(R.id.btn_open_qoo).setOnClickListener(v -> {
             QooAppOpenSDK.getInstance().openGameDetail(this);
+//            or QooAppOpenSDK.getInstance().openGameDetail(this, "action=download");
         });
 
         findViewById(R.id.btn_verify).setOnClickListener(v -> {
